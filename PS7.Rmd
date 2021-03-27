@@ -1,0 +1,415 @@
+---
+title: "PS7"
+author: "Nicole Higgins"
+date: "3/8/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r,,message=FALSE}
+require('pracma')
+library(igraph)
+```
+
+## 7.1
+**I worked with Liam, Journey, Ben and Yigit**  
+```{r, networkRussia, fig.height=8, fig.width=8, echo=FALSE}
+RusCity = c("Novgorod", "Vitebsk", "Smolensk", "Kiev", "Chernikov",
+"Novgorod Severskij", "Kursk", "Bryansk", "Karachev", "Kozelsk",
+"Dorogobusch", "Vyazma", "A", "Tver", "Vishnij Totochek", "Ksyatyn",
+"Uglich", "Yaroslavl", "Rostov", "B", "C", "Suzdal", "Vladimir",
+"Nizhnij Novgorod", "Bolgar", "Isad'-Ryazan", "Pronsk", "Dubok",
+"Elets", "Mtsensk", "Tula", "Dedoslavl", "Pereslavl", "Kolomna",
+"Moscow", "Mozhaysk", "Dmitrov", "Volok Lamskij", "Murom")
+A = rbind(c(0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), c(1, 0, 
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), c(0, 1, 0, 1, 0, 0, 
+    0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), c(0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0), c(0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0), c(0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0), c(0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0), c(0, 0, 
+    0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), c(0, 0, 0, 0, 0, 0, 
+    1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0), c(0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 
+    0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 
+    0, 1, 0, 0, 0, 0, 0), c(0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0), c(0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 
+    0), c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), c(0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0), c(1, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 1, 0, 1, 0, 0), c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0), c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0), c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), c(0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), c(0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0), c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 
+    0, 0, 0), c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    1), c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), c(0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1), c(0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 
+    0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0), c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 
+    0, 0, 0, 0, 0, 0, 0), c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0), c(0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0), c(0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0), c(0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0), c(0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 
+    0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0), c(0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 
+    0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 
+    1, 0, 1, 0, 0, 0, 0), c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 
+    0, 0, 0), c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 
+    0), c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0), c(0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0), c(0, 0, 0, 0, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+g=graph_from_adjacency_matrix(A,mode='undirected')
+V(g)$label = RusCity
+# Plot network
+#plot(g)
+```
+
+**a.** Create a vector containing the normalized Degree Centralities. See Section \@ref(degree-centrality) for help.
+```{r}
+v=rep(1,nrow(A)) # all 1s vector
+d = A %*% v  # degrees
+p=d/sum(d)   # proportion of degrees
+dp = cbind(d,p) # show d and p together side-by-side in a matrix
+rownames(dp) = RusCity
+colnames(dp) = c("degree","proportion")
+dp
+```
+**b.** Create a vector containing the Gould Index values. See Section \@ref(gould-index-summary) for help.
+```{r}
+B = A + diag(nrow(A))
+#eigen(B)
+zapsmall(eigen(B)$vectors[,1])
+```
+**c.** Plot the network where the size of the vertices is determined by Gould's Index and the size of the label is determined by degree centrality.
+```{r}
+g=graph_from_adjacency_matrix(A,mode='undirected')
+vecs = eigen(B)$vectors
+gould = vecs[,1]
+gould = gould/sum(gould)
+coords = layout_with_fr(g)
+V(g)$label = RusCity
+
+plot(g, layout=coords, vertex.size=300*gould,vertex.label.cex=10*p, vertex.color='tan1', vertex.frame.color="dodgerblue" )
+```
+**d.** Create a data frame that contains Gould's Index and Degree Centralities. The rows should be labeled with the city names and the columns should be named by the centrality measures.  Sort according to Gould's Index.
+```{r}
+Z = cbind(gould,p) 
+rownames(Z)=RusCity
+colnames(Z)=c('Gould', 'Degree')
+ii=order(gould,decreasing=TRUE)
+Z = Z[ii,]
+Z
+```
+**e.** Use Gould's Index to decide whether Moscow's dominance was solely due to its geographic location.
+**Moscow is the 6th dominant location, thus its dominance was not solely due to its location.**
+
+**f.** Compare the Gould's Index and Degree Centrality rankings and note any interesting findings. See Section \@ref(step-5) for help.
+**Ex. Ksyatyn has a large Degree Centrality but an average Gould centrality becasue it has many connections but they are less significant ones.**
+
+## 7.2
+```{r}
+Z = rbind(c(1,0,0,0),
+          c(0,1,0,0),
+          c(0,0,1,0),
+          c(0,0,0,1),
+          c(-1,-1,-1,-1))
+f = rbind(c(1,0),
+          c(0,1),
+          c(1,1),
+          c(1,2),
+          c(2,3))
+rref(t(Z))
+rref(t(f))
+```
+thus Wp = span{<1,1,1,1,1>} and fp = span{<-1,-1,1,0,0>,<-1,-2,0,1,0>,<-2,-3,0,0,1>}  
+dim(W) + dim(Wp) = 4 + 1 = 5  
+dim(f) + dim(fp) = 2 + 3 = 5
+
+## 7.3
+**a.**
+```{r}
+A = cbind(c(0,8,10,-4),
+          c(8,4,28,6),
+          c(10,28,3,-4),
+          c(-4,6,-4,-7))
+eigen(A)
+```
+**b.** 
+```{r}
+t(eigen(A)$vectors[,1:3])%*%eigen(A)$vectors[,1:3]
+```
+**c.**
+```{r}
+v = c(2,-4,-9,-2)
+v%*%eigen(A)$vectors[,1]/eigen(A)$vectors[,1]%*%eigen(A)$vectors[,1]
+v%*%eigen(A)$vectors[,2]/eigen(A)$vectors[,2]%*%eigen(A)$vectors[,2]
+v%*%eigen(A)$vectors[,3]/eigen(A)$vectors[,3]%*%eigen(A)$vectors[,3]
+v%*%eigen(A)$vectors[,4]/eigen(A)$vectors[,4]%*%eigen(A)$vectors[,4]
+```
+thus v = 8 <eigenvector 1> -4 <eigenvector 2> +3 <eigenvector 3> -4 <eigenvector 4>  
+**d.**
+```{r, eval=FALSE}
+P = eigen(A)$vectors[,1:4]
+zapsmall(P)
+zapsmall(solve(P))
+eigen(A)$values
+```
+$$A =
+\left(\begin{array}{cc} 
+-1/3 & -2/3 & 2/3 & 0\\
+-2/3 & 1/3 & 0 & -2/3\\
+-2/3 & 0 & -1/3 & 2/3\\
+0 & 2/3 & 2/3 & 1/3
+\end{array}\right)
+\left(\begin{array}{cc} 
+36 & 0 & 0 & 0\\ 
+0 & 0 & 0 & 0\\
+0 & 0 & -9 & 0\\
+0 & 0 & 0 & -27
+\end{array}\right)
+\left(\begin{array}{cc} 
+-1/3 & -2/3 & -2/3 & 0\\ 
+-2/3 & 1/3 & 0 & 2/3\\
+2/3 & 0 & -1/3 & 2/3\\
+0 & -2/3 & 2/3 & 1/3
+\end{array}\right)$$
+
+## 7.4
+
+```{r,message=FALSE, echo=FALSE}
+library(readr)
+senate.vote.file = "https://raw.github.com/Tom-Halverson/math236_s21//main/data/SenateVoting109.csv"
+record <- read_csv(senate.vote.file, col_names = TRUE)
+votes<-as.matrix(record[,4:49]) # convert the votes to a matrix
+votes<-votes[,colSums(votes)!=99]  # remove the unanimous votes
+senators = record[,1:3]
+senators$index = seq(1,99)
+```
+```{r, echo=FALSE}
+senators
+```
+```{r, echo=FALSE}
+dim(votes)
+votes[1:5,]  # show only the first 5 rows. 
+```
+```{r, echo=FALSE}
+get_votes <- function(senator) {
+  votes[unlist(senators[senators$Name==senator,4]),]
+}
+```
+```{r, echo=FALSE}
+biden = get_votes("Biden")
+biden
+```
+```{r, echo=FALSE}
+biden = get_votes("Biden")
+mcconnell  = get_votes("McConnell")
+clinton  = get_votes("Clinton")
+t(biden) %*% mcconnell
+t(biden) %*% clinton
+t(biden) %*% biden
+```
+### Question B
+
+The dot product above is always an integer. Explain what it counts. It is the number of something or possibly the difference of two things. 
+
+**The dot product is the number of times they agreed minus the number of times they disagreed. 'Disagreeing' does not include when one person abstained.**
+
+### Question A
+
+Write a function `cosine_similarity` that takes as input two vectors $\mathsf{u}$ and $\mathsf{v}$ and returns the value of $\cos(\theta)$ for the angle $\theta$ between $\mathsf{u}$ and $\mathsf{v}$. Below is a shell of the code that you need. Right now it always just returns 1.You need to fix that up. 
+
+```{r,echo=TRUE}
+cosine_similarity <- function(u, v) {
+  
+  cosine = (t(u)%*%v)/(sqrt(t(u)%*%u)*sqrt(t(v)%*%v))
+  return (cosine)
+}
+cosine_similarity(c(1,2,3,4,5), c(5,4,3,2,1))
+cosine_similarity(c(1,2,3,4,5), c(-1,-2,-3,-4,-5))
+cosine_similarity(c(1,2,3,4), c(1,-1,-1,1))
+```
+
+Demonstrate that your code works on some vectors in $\mathbb{R}^5$. Use vectors that are orthogonal, closely aligned, and close to polar opposites.
+
+### Question C
+
+Find the cosine similarity between every pair of the following senators:
+
+    + Hilary Clinton (D, NY), presidential candidate 2016
+    + John McCain (R, AZ), presidential candidate 2008
+    + Barack Obama (D, IL), president 2008-2016
+    + Susan Collins (R, ME), moderate Republican
+
+Does the cosine similarity pick up on the fact that Senator Collins is a "moderate Republican"?
+```{r}
+mccain = get_votes("McCain")
+obama = get_votes("Obama")
+collins = get_votes("Collins")
+cosine_similarity(clinton, mccain)
+cosine_similarity(clinton, obama)
+cosine_similarity(clinton, collins)
+cosine_similarity(mccain, obama)
+cosine_similarity(mccain, collins)
+cosine_similarity(obama, collins)
+```
+  Collins votes are more aligned with Obama and Clinton than McCain who votes further right. 
+
+### Question D
+
+The senate majority leader of the 109th Congress was Bill Frist (R, TN). The senate minority leader was Harry Reid (D, NV). 
+
+    * Create a function  `classify_senator(senator)` that returns "R" or "D" depending on the cosine similarity of `senator` to `frist` and to `reid`. You will have to write [an "if ... else statement" (here is the syntax)](https://www.tutorialspoint.com/r/r_if_else_statement.htm).
+  
+    * Use the chunk below to do this.
+
+    * Then run use the code below to classify all the senators. Identify all senators that are *misclassified*, meaning that their votes are more similar to the leader of the opposing party. 
+
+    * Note: Jim Jeffords (I, VT) was a Republican who became and Independent in 2001 and then caucused with the Democrats. How does your classifier handle Jeffords?
+    
+```{r, echo=TRUE}
+# Implement this function!
+# return "R" if senator is closer to frist
+# return "D" if senator is closer to reid
+classify_senator <- function(senator) {
+
+  sen = get_votes(senator)
+  frist = get_votes("Frist")
+  reid = get_votes("Reid")
+  # use the your cosine_similarity method to compare sen with frist and reid
+  if(cosine_similarity(frist,sen)>cosine_similarity(reid,sen)) {
+   val = "R"
+} else {
+   val = "D"
+}
+   
+ 
+  return (val)
+}
+```
+
+Try it out after you get it working.
+
+```{r}
+classify_senator("Obama")
+classify_senator("Grassley")
+```
+
+This code will use your function, once it works, to classify all of the senators. 
+```{r}
+my_classification = rep(0,99)
+  for (i in 1:99) {
+    my_classification[i] = classify_senator(unlist(senators[i,1]))
+  }
+senators$my_classification = my_classification
+senators
+```
+
+## 7.5
+
+**a.**
+```{r}
+f = rbind(c(1,0),
+          c(0,1),
+          c(1,1),
+          c(1,2),
+          c(2,3))
+f1 = c(1,0,1,1,2)
+f2 = c(-9,7,-2,5,3)
+rref(cbind(f,f1,f2))
+f1%*%f2
+```
+
+**b.**
+```{r}
+v = c(1,2,3,5,7)
+rref(cbind(f,v))
+(p = c((v%*%f1)/(f1%*%f1)) * f1 + c((v%*%f2)/(f2%*%f2)) * f2)
+```
+**c.**
+```{r}
+(r = cbind(v - p))
+```
+**d.**
+```{r}
+t(cbind(f1,f2))%*%r
+```
+**e.**
+```{r}
+sqrt(t(r)%*%r)
+```
+
+## 7.6
+```{r}
+A = cbind(c(1,1,-1,1,1),
+          c(1,0,1,0,1),
+          c(2,2,1,1,1))
+b = cbind(c(7,11,-3,10,7))
+```
+
+**a.**
+```{r}
+rref(cbind(A,b))
+```
+**b.**
+```{r}
+(AtA = t(A)%*%A)
+(AtB = t(A)%*%b)
+```
+**c.**
+```{r}
+(xHat = solve(AtA,AtB))
+```
+**d.**
+```{r}
+(bHat = A %*% xHat)
+```
+**e.**
+```{r}
+(r = b - bHat)
+sqrt(t(r) %*% r)
+```
+
+
+
+
+
+

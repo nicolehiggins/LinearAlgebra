@@ -1,0 +1,90 @@
+---
+title: "PSA3"
+author: "Nicole Higgins"
+date: "2/8/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(pracma)
+```
+
+## 3.8
+
+```{r}
+StP = c(.85,.09,.06)
+Roch = c(.30,.60,.10)
+Dul = c(.35,.05,.60) 
+M = cbind(StP,Roch,Dul)
+```
+**a.**  
+```{r}
+v0 = c(20,20,20)
+v1 = M %*% v0
+v1
+```
+M represents the distribution of each cities' rented cars a day later.  
+The columns represent the starting city and the rows where they end up, both in the order StP > Roch > Dul.  
+Thus, applying M to v0 predicts said distribution a day later as each starting amount is applied to its corresponding column and added. 
+
+**b.**
+```{r}
+v2 = M %*% v1
+v2
+M2 = M %*% M
+M2 %*% v0
+```
+**c.**
+```{r, warning=FALSE}
+dist <- function(today, nxtDay) {
+  n <- 0
+  while(round(today, 1) != round(nxtDay, 1)) {
+    today <- nxtDay
+    nxtDay <- M %*% today
+    n <- n + 1
+  }
+  print(round(nxtDay, 1))
+  n
+}
+
+dist(0, v0)
+```
+it took v0 9 applications to stabilize
+
+**d.**
+```{r, warning=FALSE}
+dist(0, c(60,0,0))
+dist(0, c(40,10,10))
+dist(0, c(5,10,45))
+dist(0, c(41,10,9))
+```
+they do stabilize, the ones closer to the stabilization point taking fewer applications of M to do so.
+
+## 3.9
+```{r}
+A = rbind(c( 0 , 1 , 0 , 1 , 1 ,0), 
+          c(1 , 0 , 1 , 1 , 0, 0 ),
+          c( 0 , 1 , 0 , 1 , 1, 0 ),
+          c( 1 , 1 , 1 , 0 , 1, 0 ),
+          c( 1 , 0 , 1 , 1 , 0, 1 ), 
+          c(0, 0, 0, 0, 1, 0))
+A
+```
+**a.**
+```{r}
+v = c(1,1,1,1,1,1)
+A %*% v
+```
+this vector tells us how many connections each vertex has  
+  
+**b.**
+```{r}
+A %*% A
+```
+**c.**  
+the (2,5) entry tells us 2 and 5 share 3 connections  
+the (2,3) entry tells us 2 and 3 share 1 connection   
+the (2,6) entry tells us 2 and 5 share no connections
+
+

@@ -1,0 +1,45 @@
+---
+title: "PS1A"
+author: "Nicole Higgins"
+date: "1/25/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r libraries}
+library(pracma)
+```
+
+**a.**  
+x1 = 610 + x4 - 450 = 160 + x4  
+x2 = 400 + x1 - 640 = x1 - 240  
+x3 = 600 + x2  
+x4 = x3 - 520  
+matrix prep:  
+x1           - x4 = 160  
+x1 - x2           = 240  
+   - x2 + x3      = 600  
+          x3 - x4 = 520  
+**b.**
+```{r}
+T = cbind(c(1, 1, 0, 0),
+          c(0, -1, -1, 0),
+          c(0, 0, 1, 1),
+          c(-1, 0, 0, -1),
+          c(160, 240, 600, 520))
+T
+rref(T)
+```
+x1 = 160 + x4  
+x2 = x4 - 80  
+x3 = 520 + x4  
+x4 = *free*  
+**c.**  
+when 200 cars use road x4, 360 cars will use x1, 120 cars will use x2, and 720 cars will use x3  
+when 400 cars use road x4, 560 cars will use x1, 320 cars will use x2, and 920 cars will use x3  
+**d.**  
+Yes, but only if x4 = 80 since the general equation of x2 produces this solution. We then get x1 = 240 and x3 = 600.
+

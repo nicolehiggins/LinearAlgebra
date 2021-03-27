@@ -1,0 +1,70 @@
+---
+title: "Problem 2.9"
+author: "Nicole Higgins"
+date: "02/02/2021"
+output: html_document
+---
+
+#### Enter the matrix A
+We have to load the pracma package in order to get `rref`.
+```{r, message=FALSE}
+require(pracma)
+```
+
+Here is the matrix A for this problem.
+```{r}
+A = cbind(c(12,-7,9,-4,8),c(10,-6,9,-3,7),c(-6,4,-9,-1,-5),c(8,-5,9,0,6),c(4,-7,9,-8,1),c(-18,16,-27,9,-12))
+A
+```
+#### (a) Linear Dependence
+
+Show that the columns of A are linearly independent by finding two different dependency relations among them. You can write your answer a form  like 5 a1+ 4 a2 + 3 a3 + 2 a4 + a5 = 0, where a1, a2, etc are the columns of A. 
+
+```{r}
+rref(A)
+```
+Given the RREF of *A*, we can determine:  
+*a1* = -*a4* - *a6*  
+and  
+*a2* = *a4* + 2*a6*  
+
+#### (b) Ax = b
+
+Augment A with b and show that A x = b is consistent and has infinitely many solutions.
+
+```{r}
+Ab = cbind(c(12,-7,9,-4,8),
+           c(10,-6,9,-3,7),
+           c(-6,4,-9,-1,-5),
+           c(8,-5,9,0,6),
+           c(4,-7,9,-8,1),
+           c(-18,16,-27,9,-12),
+           c(14,-12,9,-15,6))
+Ab
+rref(Ab)
+```
+The RREF of *Ab* does not reveal any inconsistencies.  
+Since *a4* and *a6* are free, there are infinitely many solutions.
+
+#### (c) Remove the redundancies
+
+Remove the free-variable columns from A to get a new, smaller matrix A'. Show that A' x = b has a unique solution and say what that solution is.
+
+```{r}
+B = cbind(c(12,-7,9,-4,8),
+           c(10,-6,9,-3,7),
+           c(-6,4,-9,-1,-5),
+           c(4,-7,9,-8,1))
+Bb = cbind(c(12,-7,9,-4,8),
+           c(10,-6,9,-3,7),
+           c(-6,4,-9,-1,-5),
+           c(4,-7,9,-8,1),
+           c(14,-12,9,-15,6))
+B
+rref(Bb)
+```
+Thus, the unique solution to *B* x = *b* is:  
+*B1* = 3  
+*B2* = -2  
+*B3* = 1  
+*B4* = 1

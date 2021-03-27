@@ -1,0 +1,34 @@
+---
+title: '6.2'
+author: "Nicole Higgins"
+date: "3/2/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(pracma)
+```
+
+```{r}
+A = cbind(c(1,1,1),
+          c(1,1,-2),
+          c(-1,1,0))
+B = cbind(c(1,-1,1),
+          c(1,2,1),
+          c(-1,-1,2))
+t(A)%*%A
+t(B)%*%B
+```
+**thus A is orthogonal and B is not.**
+
+```{r}
+w = c(-3,1,-13)
+w%*%A[,1]/A[,1]%*%A[,1]
+w%*%A[,2]/A[,2]%*%A[,2]
+w%*%A[,3]/A[,3]%*%A[,3]
+```
+**thus w = -5 A[,1] + 4 A[,2] + 2 A[,3]**  
+  
+    
+    

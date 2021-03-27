@@ -1,0 +1,137 @@
+---
+title: "PS5"
+author: "Nicole Higgins"
+date: "2/22/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(pracma)
+```
+
+## 5.1
+
+```{r}
+S = cbind(c(1,1,1,1,2),c(1, 2, 3, 0, -1),c(0, 0, 0, 1, 2), c(-1, 1, 3, 0, -2),c(2, 1, 0, 1, 3))
+rref(S)
+s = rbind(c(1,1,1,1,2),c(1, 2, 3, 0, -1),c(0, 0, 0, 1, 2), c(-1, 1, 3, 0, -2),c(2, 1, 0, 1, 3))
+rref(s)
+```
+**a.** {<1,1,1,1,2>,<1,2,3,0,-1>,<0,0,0,1,2>} is a basis of S  
+**b.** {<1,0,-1,0,1>,<0,1,2,0,-1>,<0,0,0,1,2>} is another basis of S  
+**c.**
+```{r}
+wAug = cbind(c(1,1,1,1,2),
+             c(1, 2, 3, 0, -1),
+             c(0, 0, 0, 1, 2), 
+             c(-1, 1, 3, 0, -2),
+             c(2, 1, 0, 1, 3),
+             c(8,11,14,7,11))
+vAug = cbind(c(1,1,1,1,2),
+             c(1, 2, 3, 0, -1),
+             c(0, 0, 0, 1, 2), 
+             c(-1, 1, 3, 0, -2),
+             c(2, 1, 0, 1, 3),
+             c(3,3,3,1,1))
+rref(wAug)
+rref(vAug)
+```
+Since there is an inconsistency when v is augmented with S and row reduced, it is not in S.  
+On the contrary, w is in S since it proves no inconsistencies.  
+Further, we can determine the coordinates of w with respect to Col(S) and Nul(S) by determining which scalers of the vectors in a basis cause the vectors to sum to w.  
+So, w with respect to basis a = <5,3,2> (as also seen in rref(wAug))  
+and with respect to basis b = <8,11,7>
+
+## 5.3
+```{r}
+A = rbind(c(3, 0, -1, 1, 2), 
+           c(1, 1, -1, 1, 1), 
+           c(-2, -3, -2, 3, 1), 
+           c(1, 3, 1, 3, 0),
+           c(1, 3, 0, -2, 0))
+```
+**a.**
+```{r}
+det(A)
+```
+**b.**
+```{r}
+det(A %*% A)
+```
+det(A^2) = det(A)^2  
+**c.**
+```{r}
+det(solve(A))
+```
+det(A^-1) = det(A)^-1 = 1/det(A)  
+**d.**
+```{r}
+D = rbind(c(1, 3, 0, -2, 0), 
+           c(1, 1, -1, 1, 1), 
+           c(-2, -3, -2, 3, 1), 
+           c(1, 3, 1, 3, 0),
+           c(3, 0, -1, 1, 2))
+det(D)
+```
+det(D) = -det(A)  
+**e.**
+```{r}
+E = rbind(c(3, 0, -1, 1, 2), 
+           c(1, 1, -1, 1, 1), 
+           c(-2, -3, -2, 3, 1), 
+           7*c(1, 3, 1, 3, 0),
+           c(1, 3, 0, -2, 0))
+det(E)
+```
+det(E) = 7det(A)  
+**f.**
+```{r}
+det(7*A)
+```
+det(7A) = (7^n)det(A) where n = 5  
+**g.**
+```{r}
+B = rbind(c(1, 2,1, 1, 1), 
+          c(1, 2, 0, 1, -1), 
+          c(-2, -1, -2,0, 1), 
+          c(1, 0, 1, 3, 0),
+          c(1, 0, 0, 1,1))
+det(B)
+det(A %*% B)
+det(A)*det(B)
+```
+## 5.7
+```{r}
+A.red = cbind(c(3*cos(.6747409)/4,3*sin(.6747409)/4,0), c(-3*sin(.6747409)/4,3*cos(.6747409)/4,0), c(-2/3,1.5,1))
+
+A.purple = cbind(c(0,1/2,0), c(1/2,0,0), c(1,1/2,1))
+
+A.gold = cbind(c(1/6,0,0), c(0,1/3,0), c(1/4,0,1))
+
+A.cyan = cbind(c(-1/2,0,0), c(0,-1/2,0), c(-1/2,0,1))
+
+####################
+
+house = cbind(c(0,0,1), c(0,3/4,1), c(2/4,3/4,1), c(2/4,0,1), c(4/4,0,1), c(4/4,4/4,1), c(5/4,4/4,1), c(0,8/4,1), c(-5/4,4/4,1), c(-4/4,4/4,1), c(-4/4,0,1), c(0,0,1));
+
+
+plot(house[1,], house[2,], type = "n", xlim=c(-2.5,2.5),ylim=c(-2.0,3.0),xlab="x",ylab="y")
+abline(h=-4:4, v=-4:4, col="gray", lty="dotted")
+
+house.gold = A.gold %*% house
+polygon(house.gold[1,], house.gold[2,], col = "gold", border = "blue")
+
+house.cyan = A.cyan %*% house
+polygon(house.cyan[1,], house.cyan[2,], col = "cyan", border = "blue")
+
+house.red = A.red %*% house
+polygon(house.red[1,], house.red[2,], col = "red", border = "blue")
+
+house.purple= A.purple %*% house
+polygon(house.purple[1,], house.purple[2,], col = "purple", border = "blue")
+
+polygon(house[1,], house[2,], col = "gray", border = "blue")
+```
+
+**Thank you!**

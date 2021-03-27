@@ -1,0 +1,118 @@
+---
+title: "Spotted Owl"
+author: "Math 236"
+date: "2/23/2021"
+output: html_document
+---
+
+
+### Dynamical Systems
+
+Tomorrow we will start learning about dynamical systems. In these examples $A$ is a square $n \times n$ matrix and $x_0 \in \mathbb{R}^n$ is an $n$-dimensional vector. We think of $x_0$ as the value of our vector at time $t = 0$, and the matrix $A$ is the transition matrix from one time period to the next. So, 
+$$
+x_1 = A x_0, \quad 
+x_2 = A x_1, \quad
+\cdots, \quad
+x_n = A x_{n-1}
+$$
+In this way the vector$x_n$ is recursively derived from $x_n$ by the matrix $A$. This sequence of vectors $x_0, x_1, \ldots, x_n$ connected by $A$ is called a *dynamical system*.
+
+### The Northern Spotted Owl
+
+This example is the opening example in Chapter 5 of the textbook on page 265. It comes from a 1992 study of the northern spotted owl, which was threatened with extinction due to the loss of forest habitat due to logging in the Pacific Northwest. This is currently a story featured in an NPR Podcast called [Timber Wars](https://www.npr.org/podcasts/906829608/timber-wars).
+
+
+
+The vector
+$$
+x_n = \begin{bmatrix} j_n \\ s_n \\ a_n \end{bmatrix}
+$$
+is an *age-stage* vector in which $j_n, s_n$, and $a_n$ are the number of female owls in the juvenile (up to 1 year), subadult (1-2 year), and adult (over 2 year) age groups in year $n$.
+
+The dynamics that take us from one year to the next is given by, the recursive relation $x_{n+1} = A x+n$, where $A$ is the matrix shown here. This is an age-stage matrix model that was published in [*Conservation Biology*](https://www.fs.usda.gov/treesearch/pubs/3519).
+$$
+\begin{bmatrix} j_{n+1} \\ s_{n+1} \\ a_{n+1} \end{bmatrix}
+= 
+\begin{bmatrix} 0 & 0 & 0.33 \\ 0.18 & 0 & 0 \\ 0 & 0.71 & 0.94 \end{bmatrix}
+\begin{bmatrix} j_n \\ s_n \\ a_n \end{bmatrix}
+$$
+If we multiply this system out, we get
+$$
+\begin{array} {rcl}
+j_{n+1} &=& 0.33 a_n    \\
+s_{n+1} &=& 0.18 j_n     \\
+a_{n+1} &=& 0.71 s_n + 0.94 a_n    
+\end{array}
+$$
+**Q1**.  Use this computation to explain what the values of the nonzero entries of the matrix represent. That, is 
+
+0.33 represents....., 
+
+0.18 represents, ...., 
+
+and so on.
+
+To see the dynamics play out over time, we'd like to generate the sequence of vectors in this dynamical system. Suppose that the original population of owls is distributed into age groups by
+$$
+x_0 = \begin{bmatrix} 100 \\ 76 \\ 502 \end{bmatrix}
+$$
+
+
+Here is the matrix $A$ and the initial vector $x_0$.
+```{r}
+(A = cbind(c(0,0.18,0),c(0,0,.71),c(0.33,0,0.94)))
+(x0 = c(100,76,502))
+```
+
+**Q2**. Compute $x_1, x_2, x_3, x_4$ by appropriately multiplying matrices and vectors (don't use a loop, yet).
+
+```{r}
+(x1 = A%*%x0)
+(x2 = A%*%A%*%x0)
+(x3 = A%*%A%*%A%*%x0)
+(x4 = A%*%x3)
+```
+
+**Q3**. Use the loop below to compute $x_{10}, x_{100}, x_{200}$ and $x_{1000}$.
+
+```{r}
+v = x0
+for (i in 1:100) {
+  v = A %*% v
+  }
+v
+```
+
+
+**Q4**. It is nice to store the values of $x_i$ along the way, so that we can see the dynamics of the problem happening and not just see the final value. We can do this using the code below. Where the comments are, write out what is going on in the code so that when you come back to it later it makes sense.
+
+```{r}
+N = 10  # number of columns/years/repetitions
+X = matrix(0,nrow=nrow(A),ncol=N+1) # creating matrix
+X[,1] = x0 # establishing the initial population
+for (i in 2:(N+1)) {  # repeating the process from the second iteration on
+  X[,i] = A %*% X[,i-1] # replacing the column in the matrix with the result
+}
+X # displaying the matrix
+```
+
+c We can plot the data, Check it out. Does it match the claim that the owls are threatened with extinction?
+```{r}
+tot = X[1,] + X[2,] + X[3,]
+t = seq(1,N+1)
+plot(t,X[1,],type='l',col='blue',ylim=c(0,1000),ylab="population",xlab="year",main="Spotted Owl Population")
+points(t,X[1,],col='blue',pch=20,cex=.8)
+lines(t,X[2,],col='orange')
+points(t,X[2,],col='orange',pch=20,cex=.8)
+lines(t,X[3,],col='red')
+points(t,X[3,],col='red',pch=20,cex=.8)
+points(t,tot,col='black',pch=20,cex=.8)
+lines(t,tot,col='black')
+legend(8, 1050, legend=c("juvenile", "subadults", "adults","total"), col=c('blue','orange','red','black'), lty=1)
+```
+**Q4**. Compute the eigenvalues and eigenvectors of the matrix $A$. Discuss what you see. Does it agree with what is happening to the owl population.
+
+**Q5**. Suppose that we propose that changes in logging would  increase the survival rate from juvenile to subadult (by providing a safer habitat), how much would it have to change to increase the real eigenvalue to 1 or just above 1?
+
+**Q6**. Suppose that changes in logging would  increase the reproduction rate, how much would it have to change to increase the real eigenvalue to 1 or just above 1?
+

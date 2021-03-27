@@ -1,0 +1,231 @@
+---
+title: "PS6"
+author: "Nicole Higgins"
+date: "2/24/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(pracma)
+```
+
+## 6.1
+**e.**
+```{r}
+x0 = c(1,0)
+A = cbind(c(1/2,1/2),
+          c(1/10,9/10))
+
+for (i in 1:2000) {
+  x0 = A %*% x0
+}
+x0
+```
+this vector is in the space of A infinite found previously, as expected.
+
+## 6.4
+
+```{r}
+A = cbind(c(57/50,4/50),c(-6/50,43/50))
+eigen(A)
+```
+**a.**
+```{r}
+p = cbind(c(3,1),
+          c(1,2))
+d = cbind(c(1.1,0),
+          c(0,.9))
+x = c(10,15)
+
+p%*%(d**10)%*%solve(p)%*%x
+```
+**b.**
+```{r}
+solve(p)%*%x
+```
+thus  
+rt = 3  * (1.1^t^) + 7 * (0.9^t^) and  
+ct = 1 * (1.1^t^) + 14 * (0.9^t^)  
+long term, the second term in each projection will go to 0 (eigenvalue .9) so we are left with the ratio—  
+rt:ct = 3(1.1^t^):(1.1^t^) = 3:1  
+**c.**  
+their starting population, <5,10>, is in the eigenvector of eigenvalue .9, <1,2>,  
+and the long run of being on that line is 0 since the eigenvalue is less than 1. 
+
+## 6.5
+
+**a.**
+```{r}
+A = cbind(c(-8, 3, 29), c(-40, 24, 46), c(10, 3, 11))
+B = cbind(c(4, 3, 35), c(-49, 42, 55), c(13, 3, 26))
+eigen(A)$vectors
+eigen(B)$vectors
+eigen(A)$values
+eigen(B)$values
+```
+**b.**
+```{r}
+A%*%B
+B%*%A
+```
+**c.**
+on the pdf
+
+## 6.6
+
+```{r, echo=FALSE}
+L = cbind(c(0,.06,0,0,0),
+          c(0,0,.28,0,0),
+          c(37,0,0,.16,0),
+          c(64,0,0,0,.08),
+          c(82,0,0,0,0.00))
+
+start = c(200,200,200,200,200)  # the starting distribution
+N = 35              # N is the number of iterations
+X = matrix(0,nrow=5,ncol=N)  #  Store the results in a 3 x N matrix called X
+X[,1] = start  # put start in the first column of X
+# loop N times and put your results in X
+for (i in 2:N) {X[,i] = L %*% X[,i-1]}
+# Then plot the results
+t = seq(1,N)  # time
+plot(t,X[1,],type='l',col=1,ylim=c(0,8000),ylab="population",xlab="time (year)",
+     main="Population in Age Group")
+for (i in 1:5) {
+  lines(t,X[i,],col=i)
+  points(t,X[i,],col=i,pch=20,cex=.8)}
+legend(22, 7600, legend=c("Fingerlings (0-1)", "Yearlings  (1-2)", "Young Adults (2-3)","Adults (3-4)","Adults (4-5)"), col=1:5, lty=1)
+```
+
+**a.**  
+37, 64, and 82 are scalars on the current population of young adults, adults~1~ and adults~2~,  
+respectively, that sum to equal the projected population of fingerlings a year from now.  
+Aka, the reproductive rate of each adult age group.
+0.06, 0.28, 0.16, 0.08 are scalars on the amount of  
+fingerlings, yearlings, young adults, and adults, respectively, that are expected to make it to the next year of life.
+
+**b.**
+```{r}
+eigen(L)
+```
+The overall population growth rate is the dominant eigenvalue: 0.9379134
+The limiting age distribution is the eigenvector relating to such eigenvalue, unitized: 
+```{r}
+length = sum(eigen(L)$vectors[,1])
+eigen(L)$vectors[,1]/length
+```
+
+**c.**
+```{r}
+C = cbind(c(0,.074,0,0,0),
+          c(0,0,.28,0,0),
+          c(37,0,0,.16,0),
+          c(64,0,0,0,.08),
+          c(82,0,0,0,0.00))
+
+start = c(200,200,200,200,200)  # the starting distribution
+N = 35              # N is the number of iterations
+X = matrix(0,nrow=5,ncol=N)  #  Store the results in a 3 x N matrix called X
+X[,1] = start  # put start in the first column of X
+# loop N times and put your results in X
+for (i in 2:N) {X[,i] = C %*% X[,i-1]}
+# Then plot the results
+t = seq(1,N)  # time
+plot(t,X[1,],type='l',col=1,ylim=c(0,8000),ylab="population",xlab="time (year)",
+     main="Population in Age Group")
+for (i in 1:5) {
+  lines(t,X[i,],col=i)
+  points(t,X[i,],col=i,pch=20,cex=.8)}
+legend(22, 7600, legend=c("Fingerlings (0-1)", "Yearlings  (1-2)", "Young Adults (2-3)","Adults (3-4)","Adults (4-5)"), col=1:5, lty=1)
+eigen(C)$values
+```
+By improving the survival rate by just 1.4% (from 6% to 7.4%) we can save the Brook Trout.  
+This boost in survival rate bumps the dominant eigenvector to 1.0001721, which will cause population growth as it is >1
+
+## 6.7
+
+```{r, echo=FALSE}
+get_traj <- function(mat, x0, num) {
+  traj = cbind(x0) 
+  num
+  for (i in 1:num) {
+    traj = cbind(traj, mat %*% traj[,dim(traj)[2]])
+    traj
+  }
+  return(traj)
+}
+
+plot_traj <- function(mat, x0, num) {
+  traj = get_traj(mat,x0,num)
+  points(traj[1,],traj[2,], pch=20, col=rainbow(length(traj)))
+}
+
+trajectory_plot <- function(mat, t=20, datamax=5, plotmax=10, numpoints=10, showEigenspaces=TRUE) {
+  # initialize plot
+  par(pty = "s")
+  plot(c(0),c(0),type="n",
+       xlim=c(-plotmax,plotmax),ylim=c(-plotmax,plotmax),
+       xlab='x', ylab='y')
+  abline(h=-plotmax:plotmax, v=-plotmax:plotmax, col="gray")
+  mygrid <- expand.grid(x=seq(from = -datamax, by = 2*datamax/numpoints, l = numpoints+1),
+                      y=seq(from =  -datamax, by = 2*datamax/numpoints, l = numpoints+1))
+  for (t in 1:dim(mygrid)[1]) {
+    plot_traj(A,c(mygrid[t,1],mygrid[t,2]),t)
+  }
+  if (showEigenspaces) {
+    eigen = eigen(A)
+    #mylabel = cat('lambda=', eigen$values[1], 'and lambda=', eigen$values[2])
+    #title(xlab=mylabel)
+    v1 = zapsmall(eigen$vectors[,1])
+    v2 = zapsmall(eigen$vectors[,2])
+    if (! class(v1[1]) == "complex") {
+      if (v1[1] == 0) {
+        abline(v=0)
+      } else {
+        abline(a=0,b=v1[2]/v1[1], col="blue")
+      } 
+      
+      if (v2[1] == 0) {
+        abline(v=0)
+      } else {
+        abline(a=0,b=v2[2]/v2[1], col="blue")
+      }   
+    }
+    
+  }
+}
+```
+**a.**
+```{r}
+A = cbind(c(.9,.1),c(-0.4,0.9))
+trajectory_plot(A, t=10, datamax=10, plotmax=10, numpoints=5)
+```
+**b.**
+```{r}
+eigen(A)
+```
+**c.**  
+λ = 0.9 ± 0.2i  
+v = <0.8944272,0> ± <0,0.4472136>i  
+  
+**d.**  
+```{r}
+(dil = sqrt(.9^2 + 0.2^2))
+(rot = atan(.2/.9)/(2*pi)*360)
+```
+**e.**  
+The dilation factor shows us that the plot spirals towards zero over time because it is less than one. The plot appears to be rotating at roughly 12.5 degrees.
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
